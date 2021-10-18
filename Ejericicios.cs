@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Ejericicios : MonoBehaviour
 {
+    bool meVe=false, enRago=false;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,4 +27,14 @@ public class Ejericicios : MonoBehaviour
             return false;
         }
     }
+    bool PuedeAtacar(){
+    //recuerda una funcion que devuelve valor siempre devuelve valor, en cualquier caso
+        if(meVe&&enRango){
+        //solo es true si los dos son true
+            return true;
+           }else{
+        return false;
+        }
+    }
+    
 }
