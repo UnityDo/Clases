@@ -21,17 +21,22 @@ public class CartaHearstone : MonoBehaviour
     public TipoJugador tipoJugador;
     
 //Create delegate for button
-  
+
+    void Awake()
+    {
+      RellenaInformacion();
+        botonCarta = GetComponent<Button>();
+        //le metemos una funcion al boton ()=> la funcion que quieras
+        //this es la propia instancia de la clase
+        botonCarta.onClick.AddListener(() => PulsaBoton(this));
+    }  
 
     // Start is called before the first frame update
     void Start()
     {
-        RellenaInformacion();
+        //RellenaInformacion();
 
-        botonCarta = GetComponent<Button>();
-        //le metemos una funcion al boton ()=> la funcion que quieras
-        //this es la propia instancia de la clase
-        botonCarta.onClick.AddListener(()=>PulsaBoton(this));
+        
 
         //Buscar en la jeraquia a Hearstone
         //Recojo su componente y lo almaceno
@@ -94,6 +99,14 @@ public class CartaHearstone : MonoBehaviour
     {
         ataque = _ataque;
     }
+    public int GetCoste()
+    {
+        return coste;
+    }
+    public void SetCoste(int _coste)
+    {
+        coste = _coste;
+    }
     public int GetVida()
     {
         return vida;
@@ -107,5 +120,6 @@ public class CartaHearstone : MonoBehaviour
     {
         golpe.PintaDanio(danio);
     }
+
    
 }
