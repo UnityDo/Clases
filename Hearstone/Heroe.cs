@@ -41,7 +41,15 @@ public class Heroe : MonoBehaviour
     }
     public void PoneDanio(int danio)
     {
+        StartCoroutine(AnimacionesGolpe(danio));
+    }
+    IEnumerator AnimacionesGolpe(int danio)
+    {
         golpe.PintaDanio(danio);
+        golpe.IniciaGolpe();
+        yield return new WaitForSeconds(1);
+        golpe.AcabaGolpe();
+        
     }
 
 }

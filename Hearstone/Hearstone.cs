@@ -14,7 +14,7 @@ public class Hearstone : MonoBehaviour
     //Donde se crea
     public Transform ManoJugadorPanel,ManoPcPanel,MesaJugadorPanel,MesaPcPanel;
     //La carta base
-    public CartaHearstone cartaHearstone;
+    public CartaHearstone cartaHearstonePrefab;
     //solo para visualizarlo
     public List<CartaHearstone> CartasEnManoJugador;
     public List<CartaHearstone> CartasEnManoPc;
@@ -94,9 +94,9 @@ public class Hearstone : MonoBehaviour
         //sacar una carta de la baraja
         DataHearstoneCarta cartaSacada = MazoJugador.SacaCarta();
         //pasarle esa carta a cartaHearstone
-        cartaHearstone.dataHearstoneCarta = cartaSacada;
+        cartaHearstonePrefab.dataHearstoneCarta = cartaSacada;
         //crear la carta en la manojugador
-      CartaHearstone cartaCreada=  Instantiate(cartaHearstone, ManoJugadorPanel);
+      CartaHearstone cartaCreada=  Instantiate(cartaHearstonePrefab, ManoJugadorPanel);
         cartaCreada.name = cartaSacada.nombre;
         cartaCreada.tipoJugador = TipoJugador.Jugador;
         CartasEnManoJugador.Add(cartaCreada);
@@ -107,9 +107,9 @@ public class Hearstone : MonoBehaviour
         //sacar una carta de la baraja
         DataHearstoneCarta cartaSacada = MazoPc.SacaCarta();
         //pasarle esa carta a cartaHearstone
-        cartaHearstone.dataHearstoneCarta = cartaSacada;
+        cartaHearstonePrefab.dataHearstoneCarta = cartaSacada;
         //crear la carta en la manojugador
-        CartaHearstone cartaCreada=   Instantiate(cartaHearstone, ManoPcPanel);
+        CartaHearstone cartaCreada=   Instantiate(cartaHearstonePrefab, ManoPcPanel);
         cartaCreada.name = cartaSacada.nombre;
         cartaCreada.tipoJugador = TipoJugador.Pc;
         CartasEnManoPc.Add(cartaCreada);
@@ -131,16 +131,20 @@ public class Hearstone : MonoBehaviour
             //Si la vida la carta es 0 o menos se destruye
             if (cartaElegidaJugador.GetVida() <= 0)
             {
-                Destroy(cartaElegidaJugador.gameObject);
-                //Quitar de la mesa del jugador
+                Destroy(CartasEnMesaJugador[CartasEnMesaJugador.IndexOf(cartaElegidaJugador)].gameObject);
                 CartasEnMesaJugador.Remove(cartaElegidaJugador);
+               
+                //Quitar de la mesa del jugador
+                
             }
        
             if (cartaEnfretadaPc.GetVida() <= 0)
             {
-                Destroy(cartaEnfretadaPc.gameObject);
-                //Quitar de la mesa del pc
+                Destroy(CartasEnMesaPc[CartasEnMesaPc.IndexOf(cartaEnfretadaPc)].gameObject);
                 CartasEnMesaPc.Remove(cartaEnfretadaPc);
+               
+                //Quitar de la mesa del pc
+             
             }
            
         }
@@ -158,12 +162,12 @@ public class Hearstone : MonoBehaviour
             //A�adirla a la lista de la mesa
             CartasEnMesaJugador.Add(cartaCreada);
 
-            //Eliminarse de la mano del jugador
-            Destroy(cartaHearstone.gameObject);
+           
             //Visualmente
             //De la lista de cartas del jugador
             CartasEnManoJugador.Remove(cartaHearstone);
-
+            //Eliminarse de la mano del jugador
+            Destroy(cartaHearstone.gameObject);
             //Quitamos el mana
             gemasActualesJugador -= cartaHearstone.GetCoste();
             contadorGemasJugador.PintaGemas(gemasActualesJugador, gemasMaxJugador);
@@ -180,9 +184,10 @@ public class Hearstone : MonoBehaviour
         CartasEnMesaPc.Add(cartaCreada);
 
      
-        Destroy(cartaHearstone.gameObject);
+       
   
         CartasEnManoPc.Remove(cartaHearstone);
+        Destroy(cartaHearstone.gameObject);
     }
 
     // Update is called once per frame
@@ -363,12 +368,13 @@ public class Hearstone : MonoBehaviour
                 //no puedo ir a la cabeza
             }
             //El 70% ataca a la cabeza
-            if (UnityEngine.Random.Range(0, 100) > 200)
+            if (UnityEngine.Random.Range(0, 100) >200)
             {
                 AtacaCabezaEnemigo();
             }
             else
             {
+                print("Ataca minions");
                 List<CartaHearstone> CartasPosiblesAtaque = new List<CartaHearstone>();
                 for (int i = 0; i < CartasEnMesaPc.Count; i++)
                 {
@@ -376,6 +382,7 @@ public class Hearstone : MonoBehaviour
                 }
                 if (CartasPosiblesAtaque.Count == 0)
                 {
+                    print("No hay cartas posibles");
                     cartaEnfretadaPc = CartasEnMesaPc[UnityEngine.Random.Range(0, CartasEnManoPc.Count)];
                     cartaElegidaJugador= CartasEnMesaJugador[UnityEngine.Random.Range(0, CartasEnMesaJugador.Count)];
                 }
@@ -383,10 +390,13 @@ public class Hearstone : MonoBehaviour
                 {
                     //Elegir la que tenga mas ataque
                     //Ordenar una lista por un criterio
-                    
-                    //CartasPosiblesAtaque.Sort(ComparaPorAtaque);
+                    print("Ataca al debil");
+                    CartasPosiblesAtaque.Sort(ComparaPorAtaque);
                     cartaEnfretadaPc = CartasPosiblesAtaque[0];
-                    cartaElegidaJugador = CartasEnMesaJugador[UnityEngine.Random.Range(0, CartasEnMesaJugador.Count)];
+                    //Posibilidad que ataque al rival mas debil
+                  CartasEnManoJugador.Sort(ComparaPorVida);
+                    cartaElegidaJugador = CartasEnManoJugador[CartasEnManoJugador.Count - 1];
+                   //cartaElegidaJugador = CartasEnMesaJugador[UnityEngine.Random.Range(0, CartasEnMesaJugador.Count)];
 
                 }
                 ResuelveEncuentro();
@@ -419,6 +429,41 @@ public class Hearstone : MonoBehaviour
         else
         {
             if (a.GetAtaque() == b.GetAtaque())
+            {
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
+
+        }
+    }
+    public int ComparaPorVida(CartaHearstone a, CartaHearstone b)
+    {
+        //analizar casos nulos
+        if ((a == null) && (b == null))
+        {
+            return 0;
+        }
+        if (a == null && b != null)
+        {
+            return -1;
+        }
+        else if (a != null && b == null)
+        {
+            return 1;
+        }
+
+
+
+        if (a.GetVida() > b.GetVida())
+        {
+            return 1;
+        }
+        else
+        {
+            if (a.GetVida() == b.GetVida())
             {
                 return 0;
             }

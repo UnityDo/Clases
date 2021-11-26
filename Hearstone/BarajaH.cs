@@ -5,6 +5,14 @@ using UnityEngine;
 public class BarajaH : MonoBehaviour
 {
    public List<DataHearstoneCarta> DataHearstoneCartas;
+    public DataBaraja barajaPredefinida;
+
+    private void Awake()
+    {
+        //Copio la baraja
+       DataBaraja CopiaBaraja = Instantiate(barajaPredefinida);
+        DataHearstoneCartas = CopiaBaraja.Baraja;
+    }
     // Start is called before the first frame update
     void Start()
     {
