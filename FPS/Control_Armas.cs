@@ -10,6 +10,7 @@ public class Control_Armas : MonoBehaviour
     //Cambios de arma, todas las armas son Arma
     public List<Arma> Armas;
     int indiceArma = 0;
+    public GameObject hub_sniper;
 
     // Start is called before the first frame update
     void Start()
@@ -37,6 +38,7 @@ public class Control_Armas : MonoBehaviour
         }
         //
         armaActual.Dispara();
+       
     }
     public void OnRecarga()
     {
@@ -46,6 +48,18 @@ public class Control_Armas : MonoBehaviour
         }
         //
         armaActual.Recarga();
+    }
+
+    public void OnApuntarPress()
+    {
+        StopAllCoroutines();
+        StartCoroutine(MueveArmaApunta());
+    }
+    public void OnApuntarRelease()
+    {
+
+        StopAllCoroutines();
+        StartCoroutine(MueveArmaInicial());
     }
     void CambiaArma(float mouseWheel)
     {
@@ -90,5 +104,41 @@ public class Control_Armas : MonoBehaviour
         CambiaArma((float)value.Get());
        
      
+    }
+
+    IEnumerator MueveArmaApunta()
+    {
+        float t = 0;
+        for (int i = 0; i < 50; i++)
+        {
+            t += 0.02f;
+            armaActual.transform.localPosition = Vector3.Lerp(armaActual.transform.localPosition, armaActual.dataArma.posApuntar, t);
+           //Forma de controlar excepcion
+            if (armaActual.dataArma.tipoArma == DataArma.TipoArma.francotirador)
+            {
+                hub_sniper.SetActive(true);
+                hub_sniper.GetComponent<CanvasGroup>().alpha = t*2;
+            }
+            
+            yield return null;
+        }
+   
+    }
+    IEnumerator MueveArmaInicial()
+    {
+        float t = 0;
+        for (int i = 0; i < 50; i++)
+        {
+            t += 0.02f;
+            armaActual.transform.localPosition = Vector3.Lerp(armaActual.dataArma.posApuntar, armaActual.dataArma.posInicial, t);
+            if (armaActual is Francotirador)
+            {
+                hub_sniper.SetActive(true);
+                hub_sniper.GetComponent<CanvasGroup>().alpha = 1-(t*2);
+            }
+            yield return null;
+        }
+        hub_sniper.SetActive(false);
+
     }
 }
