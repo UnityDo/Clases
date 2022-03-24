@@ -2,10 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Quiero sea un Arma
-//Quiero que pueda disparar
-//Que dispare a su manera
-public class Colt : Arma
+public class Francotirador : Arma
 {
     public Transform posDisparo;
     public Transform posCaquillo;
@@ -17,6 +14,8 @@ public class Colt : Arma
 
     public AudioSource audioSource;
 
+   public bool puedeDisparar = true;
+  
     // Start is called before the first frame update
     void Start()
     {
@@ -28,17 +27,26 @@ public class Colt : Arma
     {
         
     }
-    //Se sobreescribe el metodo Dispara
     public override void Dispara()
     {
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsTag("Idle"))
+      
+        if (!puedeDisparar)
         {
+            //no hago nada
             return;
         }
-        //Me centro en el comportamiento concreto del arma
-        print("Dispara Colt");
+        //1 Control de la cadencia de disparo con Temporizador
+        StopCoroutine(Contador());
+        StartCoroutine(Contador());
+        //2 Control de la cadencia de disparo con el animator
+
+
+
         animator.SetTrigger("Dispara");
         audioSource.PlayOneShot(dataArma.sonidoDisparo);
+
+
+
         //Disparo por Raycast
         Ray ray = new Ray();
         ray.origin = posDisparo.position;
@@ -59,14 +67,11 @@ public class Colt : Arma
             //llamo al gestor de impactos
             control_Impactos.PoneImpacto(hit.point, Quaternion.LookRotation(hit.normal), hit.collider.gameObject);
         }
+       
     }
 
     public override void Recarga()
     {
-        if (!enabled)
-        {
-            return;
-        }
         animator.SetTrigger("Recarga");
         audioSource.PlayOneShot(dataArma.sonidoRecarga);
     }
@@ -74,8 +79,14 @@ public class Colt : Arma
     public void CreaCasquillo()
     {
         //Crear un casquillo,  posCaquillo, rotacioncasquillo -> propio casquillo
-      GameObject clonCasquillo=  Instantiate(dataArma.casquillo, posCaquillo.position, dataArma.casquillo.transform.rotation);
-        clonCasquillo.GetComponent<Rigidbody>().AddForce((posCaquillo.up + new Vector3(Mathf.Pow(-1,Random.Range(1,3)), 0, 0))*dataArma.fuerzaCasquillo,ForceMode.Impulse);
-        clonCasquillo.GetComponent<Rigidbody>().AddRelativeTorque(Random.Range(200, 500), 20, Random.Range(200,800));
+        GameObject clonCasquillo = Instantiate(dataArma.casquillo, posCaquillo.position, dataArma.casquillo.transform.rotation);
+        clonCasquillo.GetComponent<Rigidbody>().AddForce((posCaquillo.right) * dataArma.fuerzaCasquillo, ForceMode.Impulse);
+        clonCasquillo.GetComponent<Rigidbody>().AddRelativeTorque(Random.Range(200, 500), 20, Random.Range(200, 800));
+    }
+    IEnumerator Contador()
+    {
+        puedeDisparar = false;
+        yield return new WaitForSeconds(1.38f);
+        puedeDisparar = true;
     }
 }

@@ -7,14 +7,11 @@ public class Revolver : Arma
 
 
     public Transform posDisparo;
-    public float alcance;
     public LayerMask layerMask;
-    public float fuerzaDisparo;
     public Control_Impactos control_Impactos;
     public Animator animator;
-    public AudioClip sonidoRecarga;
-    public AudioClip sonidoDisparo;
     public AudioSource audioSource;
+
 
     // Start is called before the first frame update
     void Start()
@@ -33,22 +30,22 @@ public class Revolver : Arma
         //Me centro en el comportamiento concreto del arma
         print("Dispara Colt");
         animator.SetTrigger("Dispara");
-        audioSource.PlayOneShot(sonidoDisparo);
+        audioSource.PlayOneShot(dataArma.sonidoDisparo);
         //Disparo por Raycast
         Ray ray = new Ray();
         ray.origin = posDisparo.position;
         ray.direction = posDisparo.forward;
         //Para visualizar rayos
-        Debug.DrawRay(ray.origin, ray.direction * alcance, Color.red, 3);
+        Debug.DrawRay(ray.origin, ray.direction * dataArma.alcance, Color.red, 3);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, alcance, layerMask, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(ray, out hit, dataArma.alcance, layerMask, QueryTriggerInteraction.Ignore))
         {
 
             print("Toca " + hit.collider.name);
             if (hit.rigidbody)
             {
                 //hit.rigidbody.AddForce(-hit.normal * fuerzaDisparo, ForceMode.Impulse);
-                hit.rigidbody.AddForceAtPosition(-hit.normal * fuerzaDisparo, hit.point, ForceMode.Impulse);
+                hit.rigidbody.AddForceAtPosition(-hit.normal * dataArma.FuerzaDisparo, hit.point, ForceMode.Impulse);
 
             }
             //llamo al gestor de impactos
@@ -63,6 +60,6 @@ public class Revolver : Arma
             return;
         }
         animator.SetTrigger("Recarga");
-        audioSource.PlayOneShot(sonidoRecarga);
+        audioSource.PlayOneShot(dataArma.sonidoRecarga);
     }
 }

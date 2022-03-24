@@ -6,6 +6,7 @@ using UnityEngine;
 //Con la palabra clave abstract
 public abstract class Arma: MonoBehaviour
 {
+    public DataArma dataArma;
     //definimos un metodo abstracto q sea comun a las clase hijas
     public abstract void Dispara();
     public abstract void Recarga();
